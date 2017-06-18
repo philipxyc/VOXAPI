@@ -54,10 +54,10 @@ wordlist = {
         "有两个",
         "以下两点",
         "以下两个",
-        "三部分",
-        "有三个",
-        "以下三点",
-        "以下三个",
+        # "三部分",
+        # "有三个",
+        # "以下三点",
+        # "以下三个",
     ],
 
     # candidate word for change topic
@@ -66,10 +66,10 @@ wordlist = {
         "其次",
         "第一",
         "第二",
-        "第三",
+        # "第三",
         "第一点",
         "第二点",
-        "第三点",
+        # "第三点",
         "下一个问题",
         "下一个话题",
         "接下来有一点",
@@ -82,6 +82,20 @@ wordlist = {
     #     "极其",
     # ],
 }
+
+# def kw_detection(text):
+#     max_kw = 5
+#     params = {'top_k': max_kw}
+#     data = json.dumps(text)
+#     print(data)
+#     headers = {'X-Token': 'HIqI4DsM.15958.iMvyeSHo0VcM'}
+#     resp = requests.post(KEYWORDS_URL, headers=headers, params=params, data=data.encode('utf-8'))
+#
+#     for weight, word in resp.json():
+#         print(weight, word)
+#     print(resp.json())
+#     return resp.json()
+
 
 info_topic = []
 info_relation = []
@@ -112,12 +126,30 @@ print(info_topic)
 print(info_relation)
 
 
-#
 for i in word_test:
     print(i)
 print(word_test)
 
+kw_list = []
+new_list = []
+temp = 0
 
+if info_topic:
+    new_list.append(word_test[:info_topic[0]])
+    for i in range(len(info_topic)):
+        if (i < len(info_topic)-1):
+            new_list.append(word_test[info_topic[i]+1:info_topic[i+1]]) # merge the sentenses of one topic
+    new_list.append(word_test[info_topic[-1]+1:])
+
+print()
+for i in new_list:
+    ans = ''
+    print(i)
+    for j in i:
+        ans += j
+    print(ans)
+    kw_temp = kw_detection(ans)
+    print(kw_temp)
 
 
 
