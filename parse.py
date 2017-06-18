@@ -1,4 +1,10 @@
-import re
+# -*- encoding: utf-8 -*-
+from __future__ import print_function, unicode_literals
+import json
+import requests
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.core.cache import cache
 
 text = '''
 政治制度是寓国家本质与形式于一体，是国体与政体的总和
@@ -47,6 +53,28 @@ text = '''
 卡萨丁JFK拉萨解放啦就是了放假啊上了飞机的拉链拉开圣诞节分厘卡啊代理商积分拉丝机拉屎啊撒旦立刻就弗利萨就
 
 '''
+
+
+text = '''
+首先我们介绍下一下vox的产品特性，
+有三个值得注意的地方，
+第一,
+是我们对音频文件中信息的挖掘，
+第二,
+是根据音频文件的信息，
+我们对线性的音频做出了可视化，
+这个可视化由思维导图的形式呈现，用来整理并体现音频里面信息的逻辑性，
+为音频信息画出了地图，
+第三,
+是我们的思维导图和进度条之间的互动，用可视的思维导图去为不可视的进度条做导航。
+那么接着是下一个话题，技术，
+第一,
+我们后端用了微软的语音识别API，
+第二,
+前端使用了D3.js实现思维导图和可视化，
+而中间这个生成思维导图的算法，则是由我们自己设计。
+'''
+
 wordlist = {
     # candidate word for parallel relationship (but or and also...)
     'paral':[
@@ -95,12 +123,28 @@ wordlist = {
 #         print(weight, word)
 #     print(resp.json())
 #     return resp.json()
+KEYWORDS_URL = 'http://api.bosonnlp.com/keywords/analysis'
+# suppose this is the text of current topic
+max_kw = 5
+def kw_detection(text):
+    params = {'top_k': max_kw}
+    data = json.dumps(text)
+    print(data)
+    headers = {'X-Token': 'HIqI4DsM.15958.iMvyeSHo0VcM'}
+    resp = requests.post(KEYWORDS_URL, headers=headers, params=params, data=data.encode('utf-8'))
+
+    for weight, word in resp.json():
+        print(weight, word)
+    print(resp.json())
+    return resp.json()
 
 
 info_topic = []
 info_relation = []
 
 word_test = text.split()
+
+
 word_test = [[item] for item in word_test]
 
 # pass 1
@@ -128,7 +172,7 @@ print(info_relation)
 
 for i in word_test:
     print(i)
-print(word_test)
+# print(word_test)
 
 kw_list = []
 new_list = []
@@ -141,16 +185,30 @@ if info_topic:
             new_list.append(word_test[info_topic[i]+1:info_topic[i+1]]) # merge the sentenses of one topic
     new_list.append(word_test[info_topic[-1]+1:])
 
-print()
+max_kw = 30
+kw_res = kw_detection(text)
+listtemp = []
 for i in new_list:
     ans = ''
-    print(i)
     for j in i:
-        ans += j
-    print(ans)
-    kw_temp = kw_detection(ans)
-    print(kw_temp)
+        # print(j,"flag")
+        if j not in [[1],[2]]:
+            ans += j[0]
+    if ans:
+        for key,word in kw_res:
+            # print(word,j[0])
+            if word in j[0]:
+                listtemp.append(word);
+    listtemp.append('frogfrog') #########################
 
+
+for i in listtemp:
+    pass
+print(listtemp)
+                # kw_temp = kw_detection(ans[0])
+    # print(set(kw_temp))
+
+#############
 
 
 # pass 2
