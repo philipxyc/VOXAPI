@@ -108,20 +108,21 @@ word_test = text.split()
 # buffer = []
 @csrf_exempt
 def url_temp(request):
-    buffer= cache.get('context') if cache.get('context') else []
-    buffer.append(request.body.decode("utf-8") )
+    json_data = json.loads(request.body)
+    if json_data['id']<0:
+        #final pocess
+        pass
+    buffer = cache.get('context') if cache.get('context') else []
+    buffer.append(json_data['text'])
+    print(buffer)
     cache.set('context', buffer, 300000)
     print(cache.get('context'))
-    if len(buffer) > max_para:
-        print(''.join(buffer))
-        res = kw_detection(''.join(buffer))
-        cache.set('context', None, 300000)
-        return HttpResponse(res) # i'm a http response
-    return HttpResponse(None)
-
-
-
-
+    # if len(buffer) > max_para:
+    #     print(''.join(buffer))
+    #     res = kw_detection(''.join(buffer))
+    #     cache.set('context', None, 300000)
+    #     return HttpResponse(res) # i'm a http response
+    return HttpResponse(json.dumps({'start_time':json_data['start_time'],'end_time':json_data['end_time']}))
 
 
 # branch sub viewpoint
